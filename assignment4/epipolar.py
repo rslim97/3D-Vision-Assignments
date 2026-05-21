@@ -153,7 +153,7 @@ if __name__ == "__main__":
     print("l_left.shape", l_left.shape)  # (3, 10)
     print("l_right.shape", l_right.shape)  # (3, 10)
     marker = ["ro--", "bo--", "go--"]
-    fig = plt.figure(figsize=(10, 15))
+    fig = plt.figure(figsize=(10, 5))
     ax1 = fig.add_subplot(121)
     # Plot first three epipolar lines in left image
     for i in range(3):
@@ -172,6 +172,7 @@ if __name__ == "__main__":
     ax2.plot(pts2[1, 0], pts2[1, 1], "bo")
     ax2.plot(pts2[2, 0], pts2[2, 1], "go")
     ax2.imshow(img2)
+    plt.tight_layout()
     plt.savefig("plot_epipolar_lines.png")
     plt.show()
 
@@ -180,7 +181,7 @@ if __name__ == "__main__":
     u, s, vh = np.linalg.svd(F)
     e_hom = vh[-1, :].T
     e = (e_hom[:2] / e_hom[-1]).astype(int)
-    fig = plt.figure(figsize=(10, 15))
+    fig = plt.figure(figsize=(10, 5))
     ax3 = fig.add_subplot(111)
     ax3.plot(e[0], e[1], "kx")
     for i in range(3):
@@ -197,6 +198,7 @@ if __name__ == "__main__":
         img1  # img[y, x], indexing in image
     )
     ax3.imshow(img1_copy)
+    plt.tight_layout()
     plt.savefig("plot_epipole.png")
     plt.show()
     # TODO 5 (5 points): Compute the 4 possible camera matrices.
