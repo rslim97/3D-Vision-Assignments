@@ -62,6 +62,7 @@ def pose_estimation(img, face2d, face3d, color):
     pitch = rad2deg(pitch)
     roll = rad2deg(roll)
     print(yaw, pitch, roll)
+    # TODO 3: Compute the reprojected 2D landmarks, face2d_repr
     # inrinsic matrix
     K_i = K
     # extrinsic matrix
@@ -88,6 +89,7 @@ def pose_estimation(img, face2d, face3d, color):
     cv2.destroyAllWindows()
 
     ### Calculate reprojection error ###
+    # TODO 4: Print the reprojection error
     # repr_error = np.sum((face2d - face2d_repr)**2) / face2d.shape[1]
     repr_error = np.sum(np.mean((face2d - face2d_repr) ** 2, axis=1))
     print(face2d_repr.shape)
@@ -135,8 +137,11 @@ if __name__ == "__main__":
     print(K)
 
     ### Pose Estimation using 68 points ###
+    # TODO 2: Pose estimation
     # repr_error : 104.44326337181667
     pose_estimation(img_copy, face2d, face3d, (255, 0, 0))
+    
     ### Pose Estimation using 51 points ###
+    # TODO 5: Repeat TODO 2 ~ TODO 4 using 51 landmarks
     # repr_error : 122.04128202553773
     pose_estimation(img_copy, face2d[:, :51], face3d[:, :51], (0, 0, 255))
