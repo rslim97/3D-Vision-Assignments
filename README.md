@@ -5,7 +5,7 @@
     </a>
 </div>
 
-### assignment2 PnP
+### assignment2 SolvePnP and Augmented Reality
 <div align="center">
     <a href="./">
         <img src="./assignment2/emma_watson_keypoints.png" width="23%"/>
@@ -15,6 +15,9 @@
     </a>
     <a href="./">
         <img src="./assignment2/emma_watson_51_pts.png" width="23%"/>
+    </a>
+    <a href="./">
+        <img src="./assignment2/augmented_reality.png" width="23%"/>
     </a>
 </div>
 
@@ -41,7 +44,7 @@
     <figcaption>Image stitching</figcaption>
 </div>
 
-### assignment4 Epipolar Geometry
+### assignment4 Epipolar Geometry and Triangulation
 <div align="center">
     <img src="./assignment4/plot_epipolar_lines.png" width="49%"/>
     <figcaption>Epipolar lines</figcaption>
