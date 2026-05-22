@@ -9,6 +9,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from math import cos, sin, atan2, sqrt
+from copy import deepcopy
 
 
 def rad2deg(x):
@@ -74,17 +75,15 @@ def pose_estimation(img, face2d, face3d, color):
     pi_0 = np.zeros((3, 4))  # Canonical projection matrix i.e. 3D-2D
     pi_0[:3, :3] = np.eye(3)
     face3d_hom = homogenize(face3d)  # (4, n)
-    face2d_repr = dehomogenize(
-        K_i @ pi_0 @ K_o @ face3d_hom
-    )  # (3, 3), (3, 4), (4, 4) (4, n)
+    # Compute projection matrix P
+    P = K_i @ pi_0 @ K_o  # (3, 3), (3, 4), (4, 4)
+    face2d_repr = dehomogenize(P @ face3d_hom)  # (4, n)
     print(face2d_repr.shape)
 
     for i in range(face2d_repr.shape[1]):
-        cv2.circle(
-            img_copy, (int(face2d_repr[0, i]), int(face2d_repr[1, i])), 1, color, 2
-        )
-    cv2.imshow("emma_watson", img_copy)
-    cv2.imwrite("emma_watson_" + str(n) + "_pts.png", img_copy)
+        cv2.circle(img, (int(face2d_repr[0, i]), int(face2d_repr[1, i])), 1, color, 2)
+    cv2.imshow("emma_watson", img)
+    cv2.imwrite("emma_watson_" + str(n) + "_pts.png", img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
@@ -94,6 +93,7 @@ def pose_estimation(img, face2d, face3d, color):
     repr_error = np.sum(np.mean((face2d - face2d_repr) ** 2, axis=1))
     print(face2d_repr.shape)
     print(repr_error)
+    return P, repr_error
 
 
 if __name__ == "__main__":
@@ -120,11 +120,12 @@ if __name__ == "__main__":
     # enter your code here
     img = cv2.imread("emma_watson.jpg")
     # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # Only used when displaying using matplotlib imshow
-    img_copy = img.copy()
+    img1 = deepcopy(img)
+    img2 = deepcopy(img)
     for i in range(face2d.shape[1]):
-        cv2.circle(img_copy, (int(face2d[0, i]), int(face2d[1, i])), 1, (0, 255, 0), 2)
-    cv2.imshow("emma_watson", img_copy)
-    cv2.imwrite("emma_watson_keypoints.png", img_copy)
+        cv2.circle(img1, (int(face2d[0, i]), int(face2d[1, i])), 1, (0, 255, 0), 2)
+    cv2.imshow("emma_watson", img1)
+    cv2.imwrite("emma_watson_keypoints.png", img1)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
@@ -139,9 +140,76 @@ if __name__ == "__main__":
     ### Pose Estimation using 68 points ###
     # TODO 2: Pose estimation
     # repr_error : 104.44326337181667
-    pose_estimation(img_copy, face2d, face3d, (255, 0, 0))
-    
+    P, repr_error = pose_estimation(img2, face2d, face3d, (255, 0, 0))
+
     ### Pose Estimation using 51 points ###
     # TODO 5: Repeat TODO 2 ~ TODO 4 using 51 landmarks
     # repr_error : 122.04128202553773
-    pose_estimation(img_copy, face2d[:, :51], face3d[:, :51], (0, 0, 255))
+    _, _ = pose_estimation(img2, face2d[:, :51], face3d[:, :51], (0, 0, 255))
+
+    # TODO 6: Augmented reality
+    xmin, ymin, zmin = np.min(face3d, axis=1) - 1
+    xmax, ymax, zmax = np.max(face3d, axis=1) + 1
+
+    # Construc array of vertices
+    vertices3d = np.array(
+        [
+            [xmin, ymin, zmin],
+            [xmax, ymin, zmin],
+            [xmax, ymax, zmin],
+            [xmin, ymax, zmin],
+            [xmin, ymin, zmax],
+            [xmax, ymin, zmax],
+            [xmax, ymax, zmax],
+            [xmin, ymax, zmax],
+        ]
+    ).T  # (d, n)
+
+    vertices3d_hom = homogenize(vertices3d)
+    vertices2d_hom = P @ vertices3d_hom
+    vertices2d = dehomogenize(vertices2d_hom)
+
+    fig = plt.figure(figsize=(10, 5))
+    ax = fig.add_subplot(111, projection="3d")
+    ax.scatter(face3d[0, :], face3d[1, :], face3d[2, :])
+
+    vertices_pairs = [
+        (0, 1),
+        (2, 3),
+        (4, 5),
+        (6, 7),
+        (1, 2),
+        (0, 3),
+        (5, 6),
+        (4, 7),
+        (0, 4),
+        (1, 5),
+        (2, 6),
+        (3, 7),
+    ]
+    for i in range(len(vertices_pairs)):
+        v_i = vertices_pairs[i][0]
+        v_j = vertices_pairs[i][1]
+        plt.plot(
+            [vertices3d[0, v_i], vertices3d[0, v_j]],
+            [vertices3d[1, v_i], vertices3d[1, v_j]],
+            [vertices3d[2, v_i], vertices3d[2, v_j]],
+            "ro-",
+        )
+    ax.view_init(elev=-113, azim=-120)
+    plt.savefig("face3d_and_vertices3d.png")
+    plt.show()
+
+    fig = plt.figure(figsize=(10, 5))
+    ax = fig.add_subplot(111)
+    ax.imshow(cv2.cvtColor(img1, cv2.COLOR_BGR2RGB))
+    for i in range(len(vertices_pairs)):
+        v_i = vertices_pairs[i][0]
+        v_j = vertices_pairs[i][1]
+        plt.plot(
+            [vertices2d[0, v_i], vertices2d[0, v_j]],
+            [vertices2d[1, v_i], vertices2d[1, v_j]],
+            "ro-",
+        )
+    plt.savefig("augmented_reality.png")
+    plt.show()
