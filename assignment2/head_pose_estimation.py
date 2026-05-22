@@ -200,7 +200,7 @@ if __name__ == "__main__":
     plt.savefig("face3d_and_vertices3d.png")
     plt.show()
 
-    fig = plt.figure(figsize=(10, 5))
+    fig = plt.figure(figsize=(5, 5))
     ax = fig.add_subplot(111)
     ax.imshow(cv2.cvtColor(img1, cv2.COLOR_BGR2RGB))
     for i in range(len(vertices_pairs)):
