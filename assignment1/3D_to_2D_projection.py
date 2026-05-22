@@ -168,52 +168,28 @@ if __name__ == "__main__":
     fig = plt.figure(figsize=(8, 8))
     ax = fig.add_subplot(111)
     ax.scatter(face2d[0, :], face2d[1, :])
-    plt.plot(vertices2d[0, :2], vertices2d[1, :2], "ro-")
-    plt.plot(vertices2d[0, 2:4], vertices2d[1, 2:4], "ro-")
-    plt.plot(vertices2d[0, 4:6], vertices2d[1, 4:6], "ro-")
-    plt.plot(vertices2d[0, 6:8], vertices2d[1, 6:8], "ro-")
-
-    plt.plot(
-        [vertices2d[0, 1], vertices2d[0, 2]],
-        [vertices2d[1, 1], vertices2d[1, 2]],
-        "ro-",
-    )
-    plt.plot(
-        [vertices2d[0, 0], vertices2d[0, 3]],
-        [vertices2d[1, 0], vertices2d[1, 3]],
-        "ro-",
-    )
-    plt.plot(
-        [vertices2d[0, 5], vertices2d[0, 6]],
-        [vertices2d[1, 5], vertices2d[1, 6]],
-        "ro-",
-    )
-    plt.plot(
-        [vertices2d[0, 4], vertices2d[0, 7]],
-        [vertices2d[1, 4], vertices2d[1, 7]],
-        "ro-",
-    )
-
-    plt.plot(
-        [vertices2d[0, 0], vertices2d[0, 4]],
-        [vertices2d[1, 0], vertices2d[1, 4]],
-        "ro-",
-    )
-    plt.plot(
-        [vertices2d[0, 1], vertices2d[0, 5]],
-        [vertices2d[1, 1], vertices2d[1, 5]],
-        "ro-",
-    )
-    plt.plot(
-        [vertices2d[0, 2], vertices2d[0, 6]],
-        [vertices2d[1, 2], vertices2d[1, 6]],
-        "ro-",
-    )
-    plt.plot(
-        [vertices2d[0, 3], vertices2d[0, 7]],
-        [vertices2d[1, 3], vertices2d[1, 7]],
-        "ro-",
-    )
+    vertices_pairs = [
+        (0, 1),
+        (2, 3),
+        (4, 5),
+        (6, 7),
+        (1, 2),
+        (0, 3),
+        (5, 6),
+        (4, 7),
+        (0, 4),
+        (1, 5),
+        (2, 6),
+        (3, 7),
+    ]
+    for i in range(len(vertices_pairs)):
+        v_i = vertices_pairs[i][0]
+        v_j = vertices_pairs[i][1]
+        plt.plot(
+            [vertices2d[0, v_i], vertices2d[0, v_j]],
+            [vertices2d[1, v_i], vertices2d[1, v_j]],
+            "ro-",
+        )
 
     white_image = np.full((540, 640, 3), 255)
     plt.imshow(white_image)

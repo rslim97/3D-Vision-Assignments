@@ -307,8 +307,8 @@ if __name__ == "__main__":
     P2 = K2 @ Rt_list[j_best[0]]
 
     m2 = P2 @ homogenize(M.T)  # reprojected 2D points in image2
-    print(m1)  # (d+1, n)
-    print(m2)  # (d+1, n)
+    # print(m1)  # (d+1, n)
+    # print(m2)  # (d+1, n)
     m1_dehom = dehomogenize(m1)
     m2_dehom = dehomogenize(m2)
     reproj_error1 = np.sum(np.sqrt(np.mean((m1_dehom - pts1.T) ** 2, axis=1)))
@@ -327,47 +327,54 @@ if __name__ == "__main__":
     ax1.view_init(elev=-90, azim=-120)
     ax1.set_aspect("equal")
     ax1.scatter(x, y, z, s=1.7)
+    vertices_pairs = [
+        (0, 1),
+        (1, 2),
+        (2, 3),
+        (3, 0),
+        (4, 5),
+        (5, 6),
+        (0, 4),
+        (1, 5),
+        (2, 6),
+    ]
     # Plot points using plt.plot(x's, y's, z's)
-    ax1.plot(M[:2, 0], M[:2, 1], M[:2, 2], "ro-")  # (v0,v1)
-    ax1.plot(M[1:3, 0], M[1:3, 1], M[1:3, 2], "ro-")  # (v1,v2)
-    ax1.plot(M[2:4, 0], M[2:4, 1], M[2:4, 2], "ro-")  # (v2,v3)
-    ax1.plot(
-        [M[3, 0], M[0, 0]], [M[3, 1], M[0, 1]], [M[3, 2], M[0, 2]], "ro-"
-    )  # (v3,v0)
-    ax1.plot(M[4:6, 0], M[4:6, 1], M[4:6, 2], "ro-")  # (v4, v5)
-    ax1.plot(M[5:7, 0], M[5:7, 1], M[5:7, 2], "ro-")  # (v5, v6)
-    ax1.plot(
-        [M[0, 0], M[4, 0]], [M[0, 1], M[4, 1]], [M[0, 2], M[4, 2]], "ro-"
-    )  # (v0, v4)
-    ax1.plot(
-        [M[1, 0], M[5, 0]], [M[1, 1], M[5, 1]], [M[1, 2], M[5, 2]], "ro-"
-    )  # (v1, v5)
-    ax1.plot(
-        [M[2, 0], M[6, 0]], [M[2, 1], M[6, 1]], [M[2, 2], M[6, 2]], "ro-"
-    )  # (v2, v6)
+    for i in range(len(vertices_pairs)):
+        v_i = vertices_pairs[i][0]
+        v_j = vertices_pairs[i][1]
+        plt.plot(
+            [M[v_i, 0], M[v_j, 0]],
+            [M[v_i, 1], M[v_j, 1]],
+            [M[v_i, 2], M[v_j, 2]],
+            "ro-",
+        )
 
     ax2 = fig.add_subplot(122, projection="3d")
     ax2.view_init(elev=-139, azim=-113)
     ax2.set_aspect("equal")
     ax2.scatter(x, y, z, s=1.7)
-    # Plot points using plt.plot(x's, y's, z's)
-    ax2.plot(M[:2, 0], M[:2, 1], M[:2, 2], "ro-")  # (v0,v1)
-    ax2.plot(M[1:3, 0], M[1:3, 1], M[1:3, 2], "ro-")  # (v1,v2)
-    ax2.plot(M[2:4, 0], M[2:4, 1], M[2:4, 2], "ro-")  # (v2,v3)
-    ax2.plot(
-        [M[3, 0], M[0, 0]], [M[3, 1], M[0, 1]], [M[3, 2], M[0, 2]], "ro-"
-    )  # (v3,v0)
-    ax2.plot(M[4:6, 0], M[4:6, 1], M[4:6, 2], "ro-")  # (v4, v5)
-    ax2.plot(M[5:7, 0], M[5:7, 1], M[5:7, 2], "ro-")  # (v5, v6)
-    ax2.plot(
-        [M[0, 0], M[4, 0]], [M[0, 1], M[4, 1]], [M[0, 2], M[4, 2]], "ro-"
-    )  # (v0, v4)
-    ax2.plot(
-        [M[1, 0], M[5, 0]], [M[1, 1], M[5, 1]], [M[1, 2], M[5, 2]], "ro-"
-    )  # (v1, v5)
-    ax2.plot(
-        [M[2, 0], M[6, 0]], [M[2, 1], M[6, 1]], [M[2, 2], M[6, 2]], "ro-"
-    )  # (v2, v6)
-    plt.savefig("triangulated_3D_points.png")
 
+    # Plot points using plt.plot(x's, y's, z's)
+    vertices_pairs = [
+        (0, 1),
+        (1, 2),
+        (2, 3),
+        (3, 0),
+        (4, 5),
+        (5, 6),
+        (0, 4),
+        (1, 5),
+        (2, 6),
+    ]
+    for i in range(len(vertices_pairs)):
+        v_i = vertices_pairs[i][0]
+        v_j = vertices_pairs[i][1]
+        plt.plot(
+            [M[v_i, 0], M[v_j, 0]],
+            [M[v_i, 1], M[v_j, 1]],
+            [M[v_i, 2], M[v_j, 2]],
+            "ro-",
+        )
+
+    plt.savefig("triangulated_3D_points.png")
     plt.show()
