@@ -112,8 +112,9 @@ if __name__ == "__main__":
     print(face3d.shape)  # (d, n)
     # (d, n) points format commonly used in 3D vision
     # Do not change the following two lines
-    face3d[1, :] *= -1
-    face3d[2, :] *= -1
+    face3d[1, :] *= -1  # Flip y axis
+    face3d[2, :] *= -1  # Flip z axis
+    # print('face3d', face3d)
     print("face3d.shape", face3d.shape)
 
     # TODO1: Display the 2D landmarks
@@ -151,7 +152,7 @@ if __name__ == "__main__":
     xmin, ymin, zmin = np.min(face3d, axis=1) - 1
     xmax, ymax, zmax = np.max(face3d, axis=1) + 1
 
-    # Construc array of vertices
+    # Construct array of vertices
     vertices3d = np.array(
         [
             [xmin, ymin, zmin],
@@ -169,10 +170,23 @@ if __name__ == "__main__":
     vertices2d_hom = P @ vertices3d_hom
     vertices2d = dehomogenize(vertices2d_hom)
 
+    # Construct world frame axis
+    length = 5
+    # X_w
+    worldframe3d = (
+        np.array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]]).T * length
+    )  # (d, n)
+
+    worldframe3d_hom = homogenize(worldframe3d)  # (4, n)
+    worldframe2d_hom = P @ worldframe3d_hom  # (3, n)
+    worldframe2d = dehomogenize(worldframe2d_hom)  # (2, n)
+
+    # Visualization
     fig = plt.figure(figsize=(10, 5))
     ax = fig.add_subplot(111, projection="3d")
     ax.scatter(face3d[0, :], face3d[1, :], face3d[2, :])
 
+    # Plot 3D plot
     vertices_pairs = [
         (0, 1),
         (2, 3),
@@ -200,9 +214,25 @@ if __name__ == "__main__":
     plt.savefig("face3d_and_vertices3d.png")
     plt.show()
 
+    # Plot 2D plot
     fig = plt.figure(figsize=(5, 5))
     ax = fig.add_subplot(111)
     ax.imshow(cv2.cvtColor(img1, cv2.COLOR_BGR2RGB))
+    origin_x, origin_y = worldframe2d[0, 0], worldframe2d[1, 0]
+    plt.plot(
+        [origin_x, worldframe2d[0, 1]], [origin_y, worldframe2d[1, 1]], "-", alpha=0.7
+    )
+    plt.plot(
+        [origin_x, worldframe2d[0, 2]], [origin_y, worldframe2d[1, 2]], "-", alpha=0.7
+    )
+    plt.plot(
+        [origin_x, worldframe2d[0, 3]], [origin_y, worldframe2d[1, 3]], "-", alpha=0.7
+    )
+    plt.text(origin_x - 15, origin_y - 15, "world_frame\n from solvePnP", fontsize=8)
+    plt.text(worldframe2d[0, 1], worldframe2d[1, 1], "x")
+    plt.text(worldframe2d[0, 2], worldframe2d[1, 2], "y")
+    plt.text(worldframe2d[0, 3], worldframe2d[1, 3], "z")
+
     for i in range(len(vertices_pairs)):
         v_i = vertices_pairs[i][0]
         v_j = vertices_pairs[i][1]
