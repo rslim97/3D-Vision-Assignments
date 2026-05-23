@@ -12,7 +12,7 @@
     <img src="./assignment1/projected_3D_Cube_in_2D_space.png" width="30%"/>
 </p>
 
-### assignment2 SolvePnP and Augmented Reality
+### assignment2 solvePnP and Augmented Reality
 <div align="center">
     <a href="./">
     </a>
